@@ -22,3 +22,7 @@ repos:
     hooks:
         - id: mypy
           additional_dependencies: [pydantic]  # add if use pydantic
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+    -   id: isort
