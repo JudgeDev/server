@@ -6,6 +6,7 @@ authors = ["jd <judge.py@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+Django = "^4.0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -42,3 +43,9 @@ exclude = '''
                      # the root of the project
 )
 '''
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 79
