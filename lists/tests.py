@@ -2,6 +2,8 @@
 
 Each test should test one thing
 Divide test into: Setup, Exercise, Assert sections
+
+Run with python manage.py test lists
 """
 from django.test import TestCase
 
