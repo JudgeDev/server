@@ -10,8 +10,10 @@
         </form>
 
         <table id="id_list_table">
-            <!-- template variable from post request -->
-            <tr><td>1: {{ new_item_text }}</td></tr>
+            <!-- template variables from post request -->
+            {% for item in items %}
+            <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
+            {% endfor %}
         </table>
     </body>
 </html>
