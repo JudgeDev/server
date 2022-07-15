@@ -12,5 +12,11 @@ from django.db import models
 
 
 # List app models
+class List(models.Model):
+    pass
+
+
 class Item(models.Model):
     text = models.TextField(default="")  # define text field column
+    # check the on_delete option
+    list = models.ForeignKey(List, default=None, on_delete=models.CASCADE)
