@@ -15,9 +15,10 @@ def home_page(request: HttpRequest) -> HttpResponse:
     return render(request, "home.html")
 
 
-def view_list(request: HttpRequest) -> HttpResponse:
+def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     """View an existing todo list"""
-    items = Item.objects.all()  # get all table items
+    list_ = List.objects.get(id=list_id)
+    items = Item.objects.filter(list=list_)
     # render request with home template and table items
     return render(request, "list.html", {"items": items})
 
@@ -25,4 +26,4 @@ def view_list(request: HttpRequest) -> HttpResponse:
 def new_list(request: HttpRequest) -> HttpResponse:
     list_ = List.objects.create()
     Item.objects.create(text=request.POST["item_text"], list=list_)
-    return redirect("/lists/the-only-list-in-the-world/")
+    return redirect(f"/lists/{list_.id}/")
