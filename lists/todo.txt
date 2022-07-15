@@ -1,7 +1,17 @@
-Don’t save blank items for every request
+X Don’t save blank items for every request
 
-Code smell: POST test is too long?
+X Code smell: POST test is too long?
 
-Display multiple items in the table
+X Display multiple items in the table
+
+X Clean up after FT runs
 
 Support more than one list!
+
+Adjust model so that items are associated with different lists
+
+Add unique URLs for each list
+
+Add a URL for creating a new list via POST
+
+Add URLs for adding a new item to an existing list via POST
