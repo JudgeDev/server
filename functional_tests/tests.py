@@ -7,6 +7,7 @@ Run with: python manage.py test functional_tests
 
 # # indicate meta-comments that are not part of the FT story
 """
+import os
 import time
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -21,6 +22,10 @@ MAX_WAIT = 10  # max time for waiting for row in table
 class NewVisitorTest(StaticLiveServerTestCase):
     def setUp(self) -> None:
         self.browser = webdriver.Chrome()
+        # name of a real staging server
+        staging_server = os.environ.get("STAGING_SERVER")
+        if staging_server:  # use real server instead of test server
+            self.live_server_url = "http://" + staging_server
 
     def tearDown(self) -> None:
         self.browser.quit()
