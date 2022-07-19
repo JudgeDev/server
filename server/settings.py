@@ -32,6 +32,9 @@ DEBUG = True
 
 ALLOWED_HOSTS: List[str] = ["*"]
 
+# allow POST requests from all subdomains
+CSRF_TRUSTED_ORIGINS: List[str] = ["http://*.ep-eye.com"]
+
 
 # Application definition
 
