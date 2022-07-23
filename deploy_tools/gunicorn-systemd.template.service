@@ -1,0 +1,15 @@
+server {
+    #root /home/jd/sites/staging.ep-eye.com;
+    listen 80;
+    server_name staging.ep-eye.com;
+
+    location /static/ {
+        alias /home/jd/sites/staging.ep-eye.com/static/;
+    }
+
+    location / {
+        proxy_pass http://unix:/tmp/staging.ep-eye.com.socket;
+        # forward original host header
+        proxy_set_header Host $host;
+    }
+}
