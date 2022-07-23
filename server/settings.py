@@ -23,14 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-0=@(j$5i3y56!_c2_1hfni3i6ufrgs)rcalr@n@l(&f#tx*jn^"
-)
-
+# SECRET_KEY = (
+#    "django-insecure-0=@(j$5i3y56!_c2_1hfni3i6ufrgs)rcalr@n@l(&f#tx*jn^"
+# )
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS: List[str] = ["*"]
+if "DJANGO_DEBUG_FALSE" in os.environ:
+    DEBUG = False
+    SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+    ALLOWED_HOSTS: List[str] = [os.environ["SITENAME"]]
+else:
+    DEBUG = True
+    SECRET_KEY = "insecure-key-for-dev"
+    ALLOWED_HOSTS = []
 
 # allow POST requests from all subdomains
 CSRF_TRUSTED_ORIGINS: List[str] = ["http://*.ep-eye.com"]
