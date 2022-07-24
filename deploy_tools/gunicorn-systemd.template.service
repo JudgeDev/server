@@ -1,15 +1,13 @@
-server {
-    #root /home/jd/sites/staging.ep-eye.com;
-    listen 80;
-    server_name staging.ep-eye.com;
+[Unit]
+Description=Gunicorn server for staging.ep-eye.com
 
-    location /static/ {
-        alias /home/jd/sites/staging.ep-eye.com/static/;
-    }
+[Service]
+Restart=on-failure
+User=jd
+WorkingDirectory=/home/jd/sites/staging.ep-eye.com
+EnvironmentFile=/home/jd/sites/staging.ep-eye.com/.env
 
-    location / {
-        proxy_pass http://unix:/tmp/staging.ep-eye.com.socket;
-        # forward original host header
-        proxy_set_header Host $host;
-    }
-}
+ExecStart= poetry run gunicorn --bind unix:/tmp/staging.ep-eye.com.socket server.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
