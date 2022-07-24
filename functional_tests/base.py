@@ -15,6 +15,8 @@ all - python manage.py test functional_tests
 single - python manage.py test functional_tests.test_file
 
 # # indicate meta-comments that are not part of the FT story
+
+Skip a test with: @skip  # type: ignore
 """
 import os
 import time
@@ -47,6 +49,17 @@ class FunctionalTest(StaticLiveServerTestCase):
                 rows = table.find_elements(By.TAG_NAME, "tr")
                 self.assertIn(row_text, [row.text for row in rows])
                 return  # assertion passes
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e  # timeout exceeded raise exception
+                time.sleep(0.5)  # wait a bit more
+
+    def wait_for(self, fn):  # type: ignore
+        """Wait helper that waits for the function fn"""
+        start_time = time.time()
+        while True:
+            try:
+                return fn()
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e  # timeout exceeded raise exception
