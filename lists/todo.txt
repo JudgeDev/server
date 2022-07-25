@@ -18,6 +18,6 @@ X Add URLs for adding a new item to an existing list via POST
 
 X Refactor away some duplication in urls.py
 
-Remove hardcoded urls from views.py
+X Remove hardcoded urls from views.py
 
-Remove hardcoded urls from forms in list.html and home.html
+Remove duplication of validation logic in views
