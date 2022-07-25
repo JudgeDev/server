@@ -17,6 +17,7 @@ class List(models.Model):
 
 
 class Item(models.Model):
-    text = models.TextField(default="")  # define text field column
+    # define text field column, defaults to blank=False
+    text = models.TextField(default="")
     # check the on_delete option
     list = models.ForeignKey(List, default=None, on_delete=models.CASCADE)
