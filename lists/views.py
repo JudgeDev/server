@@ -24,7 +24,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     error = None
     if request.method == "POST":
         try:
-            item = Item(text=request.POST["item_text"], list=list_)
+            item = Item(text=request.POST["text"], list=list_)
             item.full_clean()
             item.save()
             # redirect to same form that POST request came from
@@ -38,7 +38,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
 
 def new_list(request: HttpRequest) -> HttpResponse:
     list_ = List.objects.create()
-    item = Item(text=request.POST["item_text"], list=list_)
+    item = Item(text=request.POST["text"], list=list_)
     try:
         item.full_clean()
         item.save()

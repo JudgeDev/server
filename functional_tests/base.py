@@ -64,3 +64,7 @@ class FunctionalTest(StaticLiveServerTestCase):
                 if time.time() - start_time > MAX_WAIT:
                     raise e  # timeout exceeded raise exception
                 time.sleep(0.5)  # wait a bit more
+
+    def get_item_input_box(self):  # type: ignore
+        """Helper to get the text box"""
+        return self.browser.find_element(By.ID, "id_text")
