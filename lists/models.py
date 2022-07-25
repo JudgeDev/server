@@ -9,11 +9,14 @@ column in the database.
 Need to define any other columns explicitly
 """
 from django.db import models
+from django.urls import reverse
 
 
 # List app models
 class List(models.Model):
-    pass
+    def get_absolute_url(self) -> str:
+        # enable reverse resolution of urls via get_absolute_url
+        return reverse("view_list", args=[self.id])
 
 
 class Item(models.Model):

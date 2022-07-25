@@ -26,7 +26,8 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
             item.full_clean()
             item.save()
             # redirect to same form that POST request came from
-            return redirect(f"/lists/{list_.id}/")
+            # using url resolution
+            return redirect(list_)
         except ValidationError:
             error = "You can't have an empty list item"
     # render request with list template and table items and any errors
@@ -43,4 +44,5 @@ def new_list(request: HttpRequest) -> HttpResponse:
         list_.delete()
         error = "You can't have an empty list item"
         return render(request, "home.html", {"error": error})
-    return redirect(f"/lists/{list_.id}/")
+    # return redirect(f"/lists/{list_.id}/") using url resolution
+    return redirect(list_)
