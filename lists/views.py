@@ -19,12 +19,18 @@ def home_page(request: HttpRequest) -> HttpResponse:
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     """View an existing todo list"""
     list_ = List.objects.get(id=list_id)
+    error = None
     if request.method == "POST":
-        Item.objects.create(text=request.POST["item_text"], list=list_)
-        # redirect to same form that POST request came from
-        return redirect(f"/lists/{list_.id}/")
-    # render request with list template and table items
-    return render(request, "list.html", {"list": list_})
+        try:
+            item = Item(text=request.POST["item_text"], list=list_)
+            item.full_clean()
+            item.save()
+            # redirect to same form that POST request came from
+            return redirect(f"/lists/{list_.id}/")
+        except ValidationError:
+            error = "You can't have an empty list item"
+    # render request with list template and table items and any errors
+    return render(request, "list.html", {"list": list_, "error": error})
 
 
 def new_list(request: HttpRequest) -> HttpResponse:
