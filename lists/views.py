@@ -7,13 +7,15 @@ from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
 # Views for the lists app
 def home_page(request: HttpRequest) -> HttpResponse:
     """Home page view"""
-    return render(request, "home.html")
+    # use form for Item
+    return render(request, "home.html", {"form": ItemForm()})
 
 
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:

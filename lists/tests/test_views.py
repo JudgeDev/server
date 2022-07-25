@@ -15,6 +15,7 @@ Run with python manage.py test lists
 from django.test import TestCase
 from django.utils.html import escape
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
@@ -23,6 +24,11 @@ class HomePageTest(TestCase):
         response = self.client.get("/")  # call view directly
         # check correct template was used
         self.assertTemplateUsed(response, "home.html")
+
+    def test_home_page_uses_item_form(self) -> None:
+        response = self.client.get("/")
+        # check form is of correct class
+        self.assertIsInstance(response.context["form"], ItemForm)
 
     def test_only_saves_items_when_necessary(self) -> None:
         self.client.get("/")
