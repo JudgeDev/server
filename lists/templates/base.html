@@ -24,10 +24,10 @@
               with ItemForm passed to template -->
               {{ form.text }}
               {% csrf_token %}
-              {% if error %}
-              <div class="form-group has-error">
-                <span class="help-block">{{ error }}</span>
-              </div>
+              {% if form.errors %}  <!-- list of errors for the form -->
+                <div class="form-group has-error">
+                  <span class="help-block">{{ form.text.errors }}</span>
+                </div>
             {% endif %}
             </form>
           </div>

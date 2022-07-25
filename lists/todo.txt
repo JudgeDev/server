@@ -20,4 +20,4 @@ X Refactor away some duplication in urls.py
 
 X Remove hardcoded urls from views.py
 
-Remove duplication of validation logic in views
+X Remove duplication of validation logic in views

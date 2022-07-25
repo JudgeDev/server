@@ -3,7 +3,7 @@
 Views should process user input and return appropriate response.
 """
 
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
@@ -21,30 +21,27 @@ def home_page(request: HttpRequest) -> HttpResponse:
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     """View an existing todo list"""
     list_ = List.objects.get(id=list_id)
-    error = None
+    form = ItemForm()
+    # error = None
     if request.method == "POST":
-        try:
-            item = Item(text=request.POST["text"], list=list_)
-            item.full_clean()
-            item.save()
+        form = ItemForm(data=request.POST)
+        if form.is_valid():
+            Item.objects.create(text=request.POST["text"], list=list_)
             # redirect to same form that POST request came from
             # using url resolution
             return redirect(list_)
-        except ValidationError:
-            error = "You can't have an empty list item"
-    # render request with list template and table items and any errors
-    return render(request, "list.html", {"list": list_, "error": error})
+    # render request with list template and table items and form
+    # insted of errors
+    return render(request, "list.html", {"list": list_, "form": form})
 
 
 def new_list(request: HttpRequest) -> HttpResponse:
-    list_ = List.objects.create()
-    item = Item(text=request.POST["text"], list=list_)
-    try:
-        item.full_clean()
-        item.save()
-    except ValidationError:
-        list_.delete()
-        error = "You can't have an empty list item"
-        return render(request, "home.html", {"error": error})
-    # return redirect(f"/lists/{list_.id}/") using url resolution
-    return redirect(list_)
+    form = ItemForm(data=request.POST)  # pass request.POST data to form
+    if form.is_valid():
+        list_ = List.objects.create()
+        Item.objects.create(text=request.POST["text"], list=list_)
+        # instead of return redirect(f"/lists/{list_.id}/")
+        return redirect(list_)  # ...use url resolution
+    else:
+        # pass form to template instead of hardcoded error
+        return render(request, "home.html", {"form": form})

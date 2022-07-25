@@ -7,7 +7,12 @@ i.e. test_models.py, test_views.py, and test_forms.py.
 
 Have at least a placeholder test for every function and class.
 
-Each test should test one thing
+Avoid writing tests as a single, monolithic block of assertions
+- the view should do this and this and this, then return that with this.
+Each test should test one thing, it helps isolate the exact problem
+if the code is changed later and a bug is accidentally introduced.
+Helper methods simlify the work.
+
 Divide test into: Setup, Exercise, Assert sections
 
 Run with python manage.py test lists
@@ -15,7 +20,7 @@ Run with python manage.py test lists
 from django.test import TestCase
 from django.utils.html import escape
 
-from lists.forms import ItemForm
+from lists.forms import EMPTY_ITEM_ERROR, ItemForm
 from lists.models import Item, List
 
 
@@ -89,13 +94,34 @@ class ListViewTest(TestCase):
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
 
-    def test_validation_errors_end_up_on_lists_page(self) -> None:
+    def test_displays_item_form(self) -> None:
+        # check form is used in get requests
         list_ = List.objects.create()
-        response = self.client.post(f"/lists/{list_.id}/", data={"text": ""})
+        response = self.client.get(f"/lists/{list_.id}/")
+        self.assertIsInstance(response.context["form"], ItemForm)
+        self.assertContains(response, 'name="text"')
+
+    def post_invalid_input(self):  # type: ignore
+        # helper to for invalid input tests
+        list_ = List.objects.create()
+        return self.client.post(f"/lists/{list_.id}/", data={"text": ""})
+
+    def test_for_invalid_input_nothing_saved_to_db(self) -> None:
+        self.post_invalid_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_for_invalid_input_renders_list_template(self) -> None:
+        response = self.post_invalid_input()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "list.html")
-        expected_error = escape("You can't have an empty list item")
-        self.assertContains(response, expected_error)
+
+    def test_for_invalid_input_passes_form_to_template(self) -> None:
+        response = self.post_invalid_input()
+        self.assertIsInstance(response.context["form"], ItemForm)
+
+    def test_for_invalid_input_shows_error_on_page(self) -> None:
+        response = self.post_invalid_input()
+        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
 
 class NewListTest(TestCase):
@@ -113,15 +139,19 @@ class NewListTest(TestCase):
         new_list = List.objects.first()
         self.assertRedirects(response, f"/lists/{new_list.id}/")
 
-    def test_validation_errors_are_sent_back_to_home_page_template(
-        self,
-    ) -> None:
+    def test_for_invalid_input_renders_home_template(self) -> None:
         response = self.client.post("/lists/new", data={"text": ""})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "home.html")
+
+    def test_validation_errors_are_shown_on_home_page(self) -> None:
+        response = self.client.post("/lists/new", data={"text": ""})
         # escape ' to match rendered HTML
-        expected_error = escape("You can't have an empty list item")
-        self.assertContains(response, expected_error)
+        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    def test_for_invalid_input_passes_form_to_template(self) -> None:
+        response = self.client.post("/lists/new", data={"text": ""})
+        self.assertIsInstance(response.context["form"], ItemForm)
 
     def test_invalid_list_items_arent_saved(self) -> None:
         self.client.post("/lists/new", data={"text": ""})
