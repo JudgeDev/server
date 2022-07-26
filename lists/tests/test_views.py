@@ -48,7 +48,10 @@ class HomePageTest(TestCase):
 class ListViewTest(TestCase):
     def test_uses_list_template(self) -> None:
         list_ = List.objects.create()
+        # use the django test client
         response = self.client.get(f"/lists/{list_.id}/")
+        # check the template used
+        # then, check each item in the template context
         self.assertTemplateUsed(response, "list.html")
 
     def test_displays_only_items_for_that_list(self) -> None:
@@ -61,6 +64,7 @@ class ListViewTest(TestCase):
 
         response = self.client.get(f"/lists/{correct_list.id}/")
 
+        # test template logic: any for or if might deserve a minimal test
         # assertContain replaces
         # assertIn ("itemey 1", response.content.decode())
         self.assertContains(response, "itemey 1")
@@ -72,6 +76,8 @@ class ListViewTest(TestCase):
         List.objects.create()
         correct_list = List.objects.create()
         response = self.client.get(f"/lists/{correct_list.id}/")
+        # check that any objects are the right ones,
+        # or querysets have the correct items
         self.assertEqual(response.context["list"], correct_list)
 
     def test_can_save_a_POST_request_to_an_existing_list(self) -> None:
@@ -103,6 +109,7 @@ class ListViewTest(TestCase):
         # check form is used in get requests
         list_ = List.objects.create()
         response = self.client.get(f"/lists/{list_.id}/")
+        # check that any forms are of the correct class
         self.assertIsInstance(response.context["form"], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
@@ -113,19 +120,25 @@ class ListViewTest(TestCase):
 
     def test_for_invalid_input_nothing_saved_to_db(self) -> None:
         self.post_invalid_input()
+        # for POST requests, test both the valid invalid case
         self.assertEqual(Item.objects.count(), 0)
 
     def test_for_invalid_input_renders_list_template(self) -> None:
         response = self.post_invalid_input()
         self.assertEqual(response.status_code, 200)
+        # for POST requests, test both the valid invalid case
         self.assertTemplateUsed(response, "list.html")
 
     def test_for_invalid_input_passes_form_to_template(self) -> None:
         response = self.post_invalid_input()
+        # optionally, sanity-check form is rendered,
+        # and its errors are displayed
         self.assertIsInstance(response.context["form"], ExistingListItemForm)
 
     def test_for_invalid_input_shows_error_on_page(self) -> None:
         response = self.post_invalid_input()
+        # optionally, sanity-check form is rendered,
+        # and its errors are displayed
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
     def test_duplicate_item_validation_errors_end_up_on_lists_page(
