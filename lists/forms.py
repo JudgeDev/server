@@ -1,8 +1,12 @@
+from typing import Any
+
 from django import forms
+from django.core.exceptions import ValidationError
 
 from lists.models import Item, List
 
 EMPTY_ITEM_ERROR = "You can't have an empty list item"
+DUPLICATE_ITEM_ERROR = "You've already got this in your list"
 
 
 class ItemForm(forms.models.ModelForm):
@@ -41,3 +45,18 @@ class ItemForm(forms.models.ModelForm):
         # custom save method to allow saving of forms
         self.instance.list = for_list  # give form the list value
         return super().save()
+
+
+class ExistingListItemForm(ItemForm):
+    def __init__(self, for_list: List, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.instance.list = for_list
+
+    def validate_unique(self) -> None:
+        try:
+            self.instance.validate_unique()
+        except ValidationError as e:
+            # take the validation error, adjust its error message,
+            # and then pass it back into the form
+            e.error_dict = {"text": [DUPLICATE_ITEM_ERROR]}
+            self._update_errors(e)
