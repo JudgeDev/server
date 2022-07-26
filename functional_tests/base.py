@@ -12,7 +12,8 @@ automatically cleans up the database
 
 Run with:
 all - python manage.py test functional_tests
-single - python manage.py test functional_tests.test_file
+single file - python manage.py test functional_tests.test_file
+single test - python manage.py test functional_tests.test_file.TestClass.test
 
 # # indicate meta-comments that are not part of the FT story
 

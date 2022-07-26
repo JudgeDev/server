@@ -24,3 +24,11 @@ class Item(models.Model):
     text = models.TextField(default="")
     # check the on_delete option
     list = models.ForeignKey(List, default=None, on_delete=models.CASCADE)
+
+    class Meta:  # implement constraints
+        ordering = ("id",)
+        # sets of field names that, taken together, must be unique
+        unique_together = ("list", "text")
+
+    def __str__(self) -> str:
+        return self.text
