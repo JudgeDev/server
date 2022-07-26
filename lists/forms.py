@@ -60,3 +60,6 @@ class ExistingListItemForm(ItemForm):
             # and then pass it back into the form
             e.error_dict = {"text": [DUPLICATE_ITEM_ERROR]}
             self._update_errors(e)
+
+    def save(self):  # type: ignore
+        return forms.models.ModelForm.save(self)
