@@ -99,22 +99,20 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
+# Don't let linter break the lines with spaces
+auth_path = "django.contrib.auth.password_validation"
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.\
-            UserAttributeSimilarityValidator",
+        "NAME": auth_path + ".UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.\
-            MinimumLengthValidator",
+        "NAME": auth_path + ".MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.\
-            CommonPasswordValidator",
+        "NAME": auth_path + ".CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.\
-            NumericPasswordValidator",
+        "NAME": auth_path + ".NumericPasswordValidator",
     },
 ]
 

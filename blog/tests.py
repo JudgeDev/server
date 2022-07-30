@@ -16,47 +16,75 @@ from django.test import TestCase
 
 from blog.models import Category, Comment, Post
 
-"""
-class ProjectPageTest(TestCase):
-    def test_uses_project_template(self) -> None:
-        response = self.client.get("/projects/")  # call view directly
+
+class BlogPageTest(TestCase):
+    def test_uses_blog_template(self) -> None:
+        response = self.client.get("/blog/")  # call view directly
         # check correct template was used
-        self.assertTemplateUsed(response, "projects_index.html")
+        self.assertTemplateUsed(response, "blog_index.html")
 
     def test_uses_detail_template(self) -> None:
-        Project.objects.create(
-            title="Test Project",
-            description="Description of test project.",
-            technology="Django",
+        Post.objects.create(
+            title="Test Post",
+            body="This is a test post.",
         )
         # use the django test client
-        response = self.client.get("/projects/1/")
+        response = self.client.get("/blog/1/")
         # check the template used
         # then, check each item in the template context
-        self.assertTemplateUsed(response, "project_detail.html")
+        self.assertTemplateUsed(response, "blog_detail.html")
 
-    def test_displays_correct_template(self) -> None:
-        Project.objects.create(
-            title="Test Project",
-            description="Description of test project.",
-            technology="Django",
+    def test_displays_correct_detail_template(self) -> None:
+        Post.objects.create(
+            title="Test Post",
+            body="This is a test post.",
         )
-        Project.objects.create(
-            title="Another Test Project",
-            description="Description of another test project.",
-            technology="PyQt",
+        Post.objects.create(
+            title="Another Test Post",
+            body="This is a another test post.",
         )
 
-        response = self.client.get("/projects/1/")
+        response = self.client.get("/blog/1/")
 
         # test template logic: any for or if might deserve a minimal test
         # assertContain replaces
         # assertIn ("itemey 1", response.content.decode())
-        self.assertContains(response, "Test Project")
-        self.assertContains(response, "Description of test project.")
-        self.assertContains(response, "Django")
+        self.assertContains(response, "Test Post")
+        self.assertContains(response, "This is a test post.")
         self.assertNotContains(response, "Another Test Project")
-"""
+
+    def test_uses_category_template(self) -> None:
+        # use the django test client
+        category = Category(name="Django")
+        response = self.client.get(f"/blog/{category.name}/")
+        # check the template used
+        # then, check each item in the template context
+        self.assertTemplateUsed(response, "blog_category.html")
+
+    def test_displays_correct_category_template(self) -> None:
+        category = Category(name="Django")
+        category.save()
+        post1 = Post(
+            title="Test Post",
+            body="This is a test post.",
+        )
+        post1.save()
+        post1.categories.add(category)
+        post2 = Post(
+            title="Another Test Post",
+            body="This is a another test post.",
+        )
+        post2.save()
+        print(f"category is {category.name}")
+
+        response = self.client.get(f"/blog/{category.name}/")
+
+        # test template logic: any for or if might deserve a minimal test
+        # assertContain replaces
+        # assertIn ("itemey 1", response.content.decode())
+        self.assertContains(response, "Django")
+        self.assertContains(response, "This is a test post.")
+        self.assertNotContains(response, "Another Test Project")
 
 
 class BlogModelTest(TestCase):
