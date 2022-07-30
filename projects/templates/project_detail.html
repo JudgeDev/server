@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% block title %}{{ project.title }}{% endblock %}
 {% block container_content %}
 <h1>{{ project.title }}</h1>
 <div class="row">
