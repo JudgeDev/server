@@ -15,12 +15,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import re_path
+from django.urls import path
 
 from projects import views
 
 urlpatterns = [
-    re_path("", views.project_index, name="project_index"),
+    path("", views.project_index, name="project_index"),
+    path("<int:pk>/", views.project_detail, name="project_detail"),
     # avoid greedy capture of url with trailing slash
     # re_path(r"^(\d+)/$", views.view_list, name="view_list"),
 ]

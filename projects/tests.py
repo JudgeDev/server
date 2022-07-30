@@ -14,6 +14,8 @@ Run with python manage.py test projects
 """
 from django.test import TestCase
 
+from projects.models import Project
+
 
 class ProjectPageTest(TestCase):
     def test_uses_project_template(self) -> None:
@@ -21,161 +23,42 @@ class ProjectPageTest(TestCase):
         # check correct template was used
         self.assertTemplateUsed(response, "projects_index.html")
 
-
-""" Test material
-
-    def test_home_page_uses_item_form(self) -> None:
-        response = self.client.get("/")
-        # check form is of correct class
-        self.assertIsInstance(response.context["form"], ItemForm)
-
-    def test_only_saves_items_when_necessary(self) -> None:
-        self.client.get("/")
-        self.assertEqual(Item.objects.count(), 0)
-
-
-class ListViewTest(TestCase):
-    def test_uses_list_template(self) -> None:
-        list_ = List.objects.create()
+    def test_uses_detail_template(self) -> None:
+        Project.objects.create(
+            title="Test Project",
+            description="Description of test project.",
+            technology="Django",
+        )
         # use the django test client
-        response = self.client.get(f"/lists/{list_.id}/")
+        response = self.client.get("/projects/1/")
         # check the template used
         # then, check each item in the template context
-        self.assertTemplateUsed(response, "list.html")
+        self.assertTemplateUsed(response, "project_detail.html")
 
-    def test_displays_only_items_for_that_list(self) -> None:
-        correct_list = List.objects.create()
-        Item.objects.create(text="itemey 1", list=correct_list)
-        Item.objects.create(text="itemey 2", list=correct_list)
-        other_list = List.objects.create()
-        Item.objects.create(text="other list item 1", list=other_list)
-        Item.objects.create(text="other list item 2", list=other_list)
+    def test_displays_correct_template(self) -> None:
+        Project.objects.create(
+            title="Test Project",
+            description="Description of test project.",
+            technology="Django",
+        )
+        Project.objects.create(
+            title="Another Test Project",
+            description="Description of another test project.",
+            technology="PyQt",
+        )
 
-        response = self.client.get(f"/lists/{correct_list.id}/")
+        response = self.client.get("/projects/1/")
 
         # test template logic: any for or if might deserve a minimal test
         # assertContain replaces
         # assertIn ("itemey 1", response.content.decode())
-        self.assertContains(response, "itemey 1")
-        self.assertContains(response, "itemey 2")
-        self.assertNotContains(response, "other list item 1")
-        self.assertNotContains(response, "other list item 2")
-
-    def test_passes_correct_list_to_template(self) -> None:
-        List.objects.create()
-        correct_list = List.objects.create()
-        response = self.client.get(f"/lists/{correct_list.id}/")
-        # check that any objects are the right ones,
-        # or querysets have the correct items
-        self.assertEqual(response.context["list"], correct_list)
-
-    def test_can_save_a_POST_request_to_an_existing_list(self) -> None:
-        List.objects.create()
-        correct_list = List.objects.create()
-
-        self.client.post(
-            f"/lists/{correct_list.id}/",
-            data={"text": "A new item for an existing list"},
-        )
-
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, "A new item for an existing list")
-        self.assertEqual(new_item.list, correct_list)
-
-    def test_POST_redirects_to_list_view(self) -> None:
-        List.objects.create()
-        correct_list = List.objects.create()
-
-        response = self.client.post(
-            f"/lists/{correct_list.id}/",
-            data={"text": "A new item for an existing list"},
-        )
-
-        self.assertRedirects(response, f"/lists/{correct_list.id}/")
-
-    def test_displays_item_form(self) -> None:
-        # check form is used in get requests
-        list_ = List.objects.create()
-        response = self.client.get(f"/lists/{list_.id}/")
-        # check that any forms are of the correct class
-        self.assertIsInstance(response.context["form"], ExistingListItemForm)
-        self.assertContains(response, 'name="text"')
-
-    def post_invalid_input(self):  # type: ignore
-        # helper to for invalid input tests
-        list_ = List.objects.create()
-        return self.client.post(f"/lists/{list_.id}/", data={"text": ""})
-
-    def test_for_invalid_input_nothing_saved_to_db(self) -> None:
-        self.post_invalid_input()
-        # for POST requests, test both the valid invalid case
-        self.assertEqual(Item.objects.count(), 0)
-
-    def test_for_invalid_input_renders_list_template(self) -> None:
-        response = self.post_invalid_input()
-        self.assertEqual(response.status_code, 200)
-        # for POST requests, test both the valid invalid case
-        self.assertTemplateUsed(response, "list.html")
-
-    def test_for_invalid_input_passes_form_to_template(self) -> None:
-        response = self.post_invalid_input()
-        # optionally, sanity-check form is rendered,
-        # and its errors are displayed
-        self.assertIsInstance(response.context["form"], ExistingListItemForm)
-
-    def test_for_invalid_input_shows_error_on_page(self) -> None:
-        response = self.post_invalid_input()
-        # optionally, sanity-check form is rendered,
-        # and its errors are displayed
-        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
-
-    def test_duplicate_item_validation_errors_end_up_on_lists_page(
-        self,
-    ) -> None:
-        list1 = List.objects.create()
-        Item.objects.create(list=list1, text="textey")
-        response = self.client.post(
-            f"/lists/{list1.id}/", data={"text": "textey"}
-        )
-
-        expected_error = escape(DUPLICATE_ITEM_ERROR)
-        self.assertContains(response, expected_error)
-        self.assertTemplateUsed(response, "list.html")
-        self.assertEqual(Item.objects.all().count(), 1)
+        self.assertContains(response, "Test Project")
+        self.assertContains(response, "Description of test project.")
+        self.assertContains(response, "Django")
+        self.assertNotContains(response, "Another Test Project")
 
 
-class NewListTest(TestCase):
-    def test_can_save_a_POST_request(self) -> None:
-        # urls without trailing slash -> modify the database
-        self.client.post("/lists/new", data={"text": "A new list item"})
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, "A new list item")
-
-    def test_redirects_after_POST(self) -> None:
-        response = self.client.post(
-            "/lists/new", data={"text": "A new list item"}
-        )
-        new_list = List.objects.first()
-        self.assertRedirects(response, f"/lists/{new_list.id}/")
-
-    def test_for_invalid_input_renders_home_template(self) -> None:
-        response = self.client.post("/lists/new", data={"text": ""})
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "home.html")
-
-    def test_validation_errors_are_shown_on_home_page(self) -> None:
-        response = self.client.post("/lists/new", data={"text": ""})
-        # escape ' to match rendered HTML
-        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
-
-    def test_for_invalid_input_passes_form_to_template(self) -> None:
-        response = self.client.post("/lists/new", data={"text": ""})
-        self.assertIsInstance(response.context["form"], ItemForm)
-
-    def test_invalid_list_items_arent_saved(self) -> None:
-        self.client.post("/lists/new", data={"text": ""})
-        self.assertEqual(List.objects.count(), 0)
-        self.assertEqual(Item.objects.count(), 0)
-"""
+class ProjectModelTest(TestCase):
+    def test_default_text(self) -> None:
+        project = Project()
+        self.assertEqual(project.description, "")
