@@ -1,5 +1,7 @@
 from django.db import models
 
+from projects.models import Project
+
 
 class Category(models.Model):
     # single char field with name of category
@@ -19,6 +21,7 @@ class Post(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     # allow access to relationship from category object
     categories = models.ManyToManyField("Category", related_name="posts")
+    project = models.ForeignKey(Project, null=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         # display name of instance, eg in admin

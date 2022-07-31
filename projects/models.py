@@ -11,3 +11,7 @@ class Project(models.Model):
     technology = models.CharField(max_length=20)
     # file path to image
     image = models.FilePathField(path="/img")
+
+    def __str__(self) -> str:
+        # display name of instance, eg in admin
+        return self.title
