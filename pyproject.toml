@@ -8,6 +8,7 @@ authors = ["jd <judge.py@gmail.com>"]
 python = "^3.9"
 Django = "^4.0.6"
 gunicorn = "^20.1.0"
+python-epo-ops-client = "^4.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

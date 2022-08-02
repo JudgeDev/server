@@ -11,7 +11,6 @@ from projects.models import Project
 def project_index(request: HttpRequest) -> HttpResponse:
     projects = Project.objects.all()  # query all projects
     context: Dict[str, str] = {"projects": projects}
-    print([project.title for project in projects])
     return render(request, "projects_index.html", context)
 
 
