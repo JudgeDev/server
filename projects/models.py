@@ -10,7 +10,8 @@ class Project(models.Model):
     # select number of choices
     technology = models.CharField(max_length=20)
     # file path to image
-    image = models.FilePathField(path="/img")
+    # for adming, path must be a valid absolute address to a dir
+    image = models.FileField(null=True, blank=True)
 
     def __str__(self) -> str:
         # display name of instance, eg in admin
