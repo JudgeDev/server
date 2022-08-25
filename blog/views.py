@@ -1,6 +1,7 @@
 """Blog views"""
 from typing import Dict
 
+import markdown  # type: ignore
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
@@ -30,6 +31,15 @@ def blog_detail(request: HttpRequest, pk: int) -> HttpResponse:
             comment.save()
 
     comments = Comment.objects.filter(post=post)
+    # process post body to render markdown in html
+    post.body = markdown.markdown(
+        post.body,
+        extensions=[
+            "markdown.extensions.extra",
+            "markdown.extensions.codehilite",
+            "markdown.extensions.toc",
+        ],
+    )
     context: Dict[str, str] = {
         "post": post,
         "comments": comments,
